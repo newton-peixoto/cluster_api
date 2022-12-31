@@ -1,3 +1,3 @@
 #!/bin/sh
 cd -P -- "$(dirname -- "$0")"
-PHX_SERVER=true exec ./cluster_api start
+RELEASE_DISTRIBUTION=name RELEASE_NODE=cluster_api@$(hostname -i) RELEASE_COOKIE=monster PHX_SERVER=true exec ./cluster_api start

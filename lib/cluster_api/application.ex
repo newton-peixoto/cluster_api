@@ -14,7 +14,18 @@ defmodule App.Application do
       {Phoenix.PubSub, name: App.PubSub},
       # Start the Endpoint (http/https)
       AppWeb.Endpoint,
-      App.Cache
+      App.Cache,
+      {Cluster.Supervisor, [
+        [
+          dns: [
+            strategy: Cluster.Strategy.DNSPoll,
+            config: [polling_interval: 5_000, query: "app", node_basename: "cluster_api"]
+          ]
+        ]
+
+      ]
+      },
+      {Task, fn -> ping_nodes() end}
       # Start a worker by calling: App.Worker.start_link(arg)
       # {App.Worker, arg}
     ]
@@ -31,5 +42,14 @@ defmodule App.Application do
   def config_change(changed, _new, removed) do
     AppWeb.Endpoint.config_change(changed, removed)
     :ok
+  end
+
+  defp ping_nodes() do
+    Process.sleep(1_000)
+    Node.list()
+    |> Enum.each(fn node ->
+      IO.puts("[#{inspect(Node.self())} -> #{inspect(node)}] #{inspect(Node.ping(node))}")
+    end)
+    ping_nodes()
   end
 end
