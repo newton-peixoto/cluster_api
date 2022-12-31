@@ -12,7 +12,7 @@ config :cluster_api,
 
 # Configures the endpoint
 config :cluster_api, AppWeb.Endpoint,
-  url: [host: "localhost"],
+  url: [host: "0.0.0.0"],
   render_errors: [view: AppWeb.ErrorView, accepts: ~w(json), layout: false],
   pubsub_server: App.PubSub,
   live_view: [signing_salt: "8FbGdR0/"]
