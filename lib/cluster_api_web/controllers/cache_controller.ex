@@ -1,13 +1,14 @@
 defmodule AppWeb.CacheController do
 
   use AppWeb, :controller
-  alias App.Cache
+  alias App.CacheStarter
+
   def get(conn, _params) do
    info =  %{
       "date" => DateTime.utc_now(),
       "current_node" => node()
     }
-    cache = Cache.get()
+    cache = CacheStarter.get()
     response = Map.merge(info, cache)
     conn |> json(response)
   end
@@ -15,7 +16,7 @@ defmodule AppWeb.CacheController do
   def store(conn, params) do
     %{"value" => value, "key" => key} = params
 
-    Cache.save(key, value)
+    CacheStarter.save(key, value)
 
      conn |> json(%{saved: true})
    end

@@ -1,20 +1,15 @@
 defmodule App.Cache do
   use GenServer
 
-  def start_link( _args \\ []) do
-    GenServer.start_link(__MODULE__, %{node_cached_started: node()}, [name: __MODULE__] )
+  def start_link(opts \\ []) do
+    name = Keyword.get(opts, :name, __MODULE__)
+
+    GenServer.start_link(__MODULE__, %{node_started: node() }, name: name)
   end
 
-  def init(args) do
-    {:ok, args}
-  end
-
-  def get() do
-    GenServer.call(__MODULE__, :get)
-  end
-
-  def save(key, value) do
-    GenServer.cast(__MODULE__, {:store, key, value})
+  @impl GenServer
+  def init(state) do
+    {:ok, state}
   end
 
   def handle_call(:get, _from, state) do
@@ -22,12 +17,8 @@ defmodule App.Cache do
   end
 
   def handle_cast({:store, key, value}, state) do
-
     state = Map.put(state, key, value)
 
     {:noreply, state}
   end
-
-
-
 end
