@@ -25,7 +25,7 @@ defmodule App.Application do
 
       ]
       },
-      {Task, fn -> ping_nodes() end}
+      #{Task, fn -> ping_nodes() end}
       # Start a worker by calling: App.Worker.start_link(arg)
       # {App.Worker, arg}
     ]

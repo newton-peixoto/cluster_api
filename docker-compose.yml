@@ -4,8 +4,11 @@ services:
   app:
     build:
       context: .
-      args:
-        - ENV_MIX=dev
+      dockerfile: ./.docker/dev/Dockerfile
+    environment:
+      - MIX_ENV=dev
+    volumes:
+      - .:/app
     deploy:
       replicas: 2
       restart_policy:
