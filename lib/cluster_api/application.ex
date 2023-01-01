@@ -12,7 +12,8 @@ defmodule App.Application do
       App.HordeRegistry,
       App.HordeSupervisor,
       App.NodeObserver,
-      App.CacheStarter
+      App.CacheStarter,
+      App.StateBackup
     ]
 
     opts = [strategy: :one_for_one, name: App.Supervisor]
