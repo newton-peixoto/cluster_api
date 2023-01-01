@@ -6,7 +6,9 @@ defmodule AppWeb.CacheController do
   def get(conn, _params) do
    info =  %{
       "date" => DateTime.utc_now(),
-      "current_node" => node()
+      "current_node" => node(),
+      "node_list" => Node.list(),
+      "Env" => System.get_env("MIX_ENV")
     }
     cache = CacheStarter.get()
     response = Map.merge(info, cache)

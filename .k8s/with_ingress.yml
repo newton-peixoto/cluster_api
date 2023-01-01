@@ -1,0 +1,74 @@
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: cluster-api-deployment
+  namespace: default
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      app: cluster-api
+  template:
+    metadata:
+      labels:
+        app: cluster-api
+    spec:
+      containers:
+      - name: cluster-api
+        image: cluster:1.6
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 4000
+        env:
+        - name: SECRET_KEY_BASE
+          value: "nnZYyX3y2NJP2Mf/vGFX9ilh4DtMwPdQ8CZYhd/pb83J/GXVUwFwfByRY1t2C49w"
+        - name: PORT
+          value: "4000"
+        - name: ERLANG_COOKIE
+          value: "secret"
+        - name: MY_POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        command: ["elixir"]
+        args: [
+          "--name", 
+          "cluster@$(MY_POD_IP)", 
+          "--cookie","$(ERLANG_COOKIE)", 
+          "--no-halt", 
+          "-S","mix",
+          "phx.server"
+        ]
+---
+kind: Service
+apiVersion: v1
+
+metadata:
+  name: cluster-api-service
+  namespace: default
+spec:
+  clusterIP: None
+  selector:
+    app: cluster-api
+  ports:
+      - name: http
+        port: 4000
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: cluster-api-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+  - http:
+      paths:
+      - pathType: Prefix
+        path: /
+        backend:
+          service:
+            name: cluster-api-service
+            port:
+              number: 4000

@@ -14,6 +14,17 @@ config :cluster_api, AppWeb.Endpoint, cache_static_manifest: "priv/static/cache_
 # Do not print debug messages in production
 config :logger, level: :info
 
+config :libcluster,
+  topologies: [
+    dns: [
+      strategy: Elixir.Cluster.Strategy.Kubernetes.DNS,
+        config: [
+          service: "cluster-api-service",
+          application_name: "cluster"
+        ]
+      ]
+  ]
+
 # ## SSL Support
 #
 # To get SSL working, you will need to add the `https` key

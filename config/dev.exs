@@ -16,6 +16,14 @@ config :cluster_api, AppWeb.Endpoint,
   secret_key_base: "nnZYyX3y2NJP2Mf/vGFX9ilh4DtMwPdQ8CZYhd/pb83J/GXVUwFwfByRY1t2C49w",
   watchers: []
 
+
+config :libcluster,
+topologies: [
+  dns: [
+    strategy: Cluster.Strategy.DNSPoll,
+    config: [polling_interval: 5_000, query: "app", node_basename: "cluster_api"]
+  ]
+]
 # ## SSL Support
 #
 # In order to use HTTPS in development, a self-signed

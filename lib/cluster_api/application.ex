@@ -7,13 +7,13 @@ defmodule App.Application do
       AppWeb.Telemetry,
       {Phoenix.PubSub, name: App.PubSub},
       AppWeb.Endpoint,
-      {Cluster.Supervisor, [topologies()]
+      {Cluster.Supervisor, [Application.get_env(:libcluster, :topologies)]
       },
+      App.StateBackup,
       App.HordeRegistry,
       App.HordeSupervisor,
       App.NodeObserver,
-      App.CacheStarter,
-      App.StateBackup
+      App.CacheStarter
     ]
 
     opts = [strategy: :one_for_one, name: App.Supervisor]
@@ -26,14 +26,5 @@ defmodule App.Application do
   def config_change(changed, _new, removed) do
     AppWeb.Endpoint.config_change(changed, removed)
     :ok
-  end
-
-  defp topologies() do
-    [
-      dns: [
-        strategy: Cluster.Strategy.DNSPoll,
-        config: [polling_interval: 5_000, query: "app", node_basename: "cluster_api"]
-      ]
-    ]
   end
 end
