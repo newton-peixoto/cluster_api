@@ -4,6 +4,10 @@ ENV APP_HOME /app
 RUN mkdir $APP_HOME
 WORKDIR $APP_HOME
 
+EXPOSE 4000
+ENV PORT 4000 
+ENV MIX_ENV dev
+
 COPY . .
 
 RUN apt-get update && \

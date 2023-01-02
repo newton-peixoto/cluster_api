@@ -2,13 +2,9 @@ version: '3'
 
 services:
   app:
-    build:
-      context: .
-      dockerfile: ./.docker/dev/Dockerfile
+    image: cluster-api
     environment:
       - MIX_ENV=dev
-    volumes:
-      - .:/app
     deploy:
       replicas: 3
       restart_policy:
