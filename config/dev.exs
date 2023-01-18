@@ -17,13 +17,10 @@ config :cluster_api, AppWeb.Endpoint,
   watchers: []
 
 
-config :libcluster,
-topologies: [
-  dns: [
-    strategy: Cluster.Strategy.DNSPoll,
-    config: [polling_interval: 5_000, query: "app", node_basename: "cluster_api"]
+  config :libcluster,
+  topologies: [
+    local: [strategy: Elixir.Cluster.Strategy.LocalEpmd]
   ]
-]
 # ## SSL Support
 #
 # In order to use HTTPS in development, a self-signed

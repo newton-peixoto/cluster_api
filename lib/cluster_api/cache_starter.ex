@@ -37,11 +37,25 @@ defmodule App.CacheStarter do
   end
 
   def get() do
-    whereis() |> GenServer.call( :get)
+
+    try do
+      whereis() |> GenServer.call( :get)
+     catch
+       _ -> %{}
+     end
+
   end
 
   def save(key, value) do
-    whereis() |> GenServer.cast({:store, key, value})
+    try do
+      whereis() |> GenServer.cast({:store, key, value})
+     catch
+       _ -> :ok
+     end
+    case whereis() do
+      nil -> :ok
+      _ ->  whereis() |> GenServer.cast({:store, key, value})
+    end
   end
 
   def whereis(name \\ Cache) do

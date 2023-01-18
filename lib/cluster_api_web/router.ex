@@ -12,6 +12,8 @@ defmodule AppWeb.Router do
 
     get "/save", CacheController, :store
 
+    get "/ready", CacheController, :ready
+
   end
 
   # Enables the Swoosh mailbox preview in development.

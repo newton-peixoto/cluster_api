@@ -1,12 +1,14 @@
 defmodule App.StateBackup do
   use GenServer
+  require Logger
 
   def start_link( _args \\ []) do
-    IO.puts "Começando o genserver de backup"
-    GenServer.start_link(__MODULE__, %{}, [name: __MODULE__] )
+    current_state = App.CacheStarter.get()
+    GenServer.start_link(__MODULE__, current_state, [name: __MODULE__] )
   end
 
   def init(args) do
+    Logger.info("[NODE] #{node()} começando o StateBackup")
     {:ok, args}
   end
 
@@ -19,9 +21,8 @@ defmodule App.StateBackup do
     {:reply, state, state}
   end
 
-  def handle_info({:backup, new_state}, state) do
+  def handle_info({:backup, new_state}, _state) do
+    Logger.info("[NODE] #{inspect(node())} recebendo o backup")
     {:noreply, new_state}
   end
-
-
 end

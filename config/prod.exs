@@ -16,13 +16,10 @@ config :logger, level: :info
 
 config :libcluster,
   topologies: [
-    dns: [
-      strategy: Elixir.Cluster.Strategy.Kubernetes.DNS,
-        config: [
-          service: "cluster-api-service",
-          application_name: "cluster"
-        ]
-      ]
+    swarm_dns_poll: [
+      strategy: Cluster.Strategy.DNSPoll,
+      config: [query: "tasks.stach_cluster", node_basename: "cluster_api"]
+    ]
   ]
 
 # ## SSL Support

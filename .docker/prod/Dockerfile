@@ -6,6 +6,9 @@ ADD . /app
 EXPOSE 4000
 ENV PORT 4000 
 ENV MIX_ENV prod
+ENV REPLACE_OS_VARS true
+ENV PHX_SERVER true
+ENV SECRET_KEY_BASE REALLY_LONG_SECRET
 
 RUN mix local.hex --force && \
 	mix local.rebar --force && \
@@ -13,4 +16,6 @@ RUN mix local.hex --force && \
 
 RUN mix deps.get && mix deps.compile
 
-CMD ["mix", "phx.server"]
+RUN mix release
+
+CMD ["_build/prod/rel/cluster_api/bin/cluster_api", "start"]

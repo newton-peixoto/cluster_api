@@ -23,4 +23,12 @@ defmodule AppWeb.CacheController do
      conn |> json(%{saved: true})
    end
 
+   def ready(conn, _params) do
+     try do
+      conn |> json(%{error: false, pid: inspect App.CacheStarter.whereis()})
+     catch
+       _ -> conn |>  put_status(:internal_server_error) |> json(%{error: true})
+     end
+   end
+
 end
