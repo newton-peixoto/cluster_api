@@ -9,11 +9,7 @@ defmodule App.Application do
       AppWeb.Endpoint,
       {Cluster.Supervisor, [Application.get_env(:libcluster, :topologies)]
       },
-      App.StateBackup,
-      App.HordeRegistry,
-      App.HordeSupervisor,
-      App.NodeObserver,
-      App.CacheStarter
+      App.Cache
     ]
 
     opts = [strategy: :one_for_one, name: App.Supervisor]

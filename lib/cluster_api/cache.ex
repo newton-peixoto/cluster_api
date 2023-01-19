@@ -1,21 +1,25 @@
 defmodule App.Cache do
   use GenServer
+
   require Logger
 
-  def start_link(opts \\ []) do
-    name = Keyword.get(opts, :name, __MODULE__)
-    GenServer.start_link(__MODULE__, %{node_started: node()}, name: name)
+  def start_link( _args \\ []) do
+    GenServer.start_link(__MODULE__, %{}, [name: __MODULE__] )
   end
 
-  @impl GenServer
-  def init(state) do
-    Logger.info("[CACHE] Iniciando no node #{node()}")
-    Process.flag(:trap_exit, true)
-    {:ok, state, {:continue, :load_state}}
+  @impl true
+  def init(args) do
+    Logger.info("[CACHE] #{node()} started")
+    Phoenix.PubSub.subscribe(App.PubSub, "cache")
+    Phoenix.PubSub.broadcast(App.PubSub, "cache", :inflate)
+    {:ok, args}
+  end
+  def get() do
+    GenServer.call(__MODULE__, :get)
   end
 
-  def handle_continue(:load_state, state) do
-    {:noreply, Map.merge(App.StateBackup.backup(), state)}
+  def save(key, value) do
+    GenServer.cast(__MODULE__, {:store, key, value})
   end
 
   @impl true
@@ -26,31 +30,18 @@ defmodule App.Cache do
   @impl true
   def handle_cast({:store, key, value}, state) do
     state = Map.put(state, key, value)
-
-    {:noreply, state}
-  end
-
-  def handle_info(
-        {:EXIT, _, {:name_conflict, {App.Cache, nil}, App.HordeRegistry, _}},
-        state
-      ) do
-    Logger.info("[CACHE] #{node()} Já existia um processo global com esse nome")
-
-    send(App.StateBackup, {:backup,App.CacheStarter.get })
-
-    for node <- Node.list() do
-      Logger.info("[CACHE] #{node()} Enviando BACKUP para #{inspect(node)}")
-      send({App.StateBackup, node}, {:backup, App.CacheStarter.get})
-    end
-
+    Phoenix.PubSub.broadcast(App.PubSub, "cache", {:state, state})
     {:noreply, state}
   end
 
   @impl true
-  def terminate(_reason, state) do
-    for node <- Node.list() do
-      Logger.info("[CACHE] #{node()} Enviando BACKUP para #{inspect(node)}")
-      send({App.StateBackup, node}, {:backup, state})
-    end
+  def handle_info({:state, new_state}, state) do
+    {:noreply, Map.merge(state, new_state)}
+  end
+
+  @impl true
+  def handle_info(:inflate, state) do
+    Phoenix.PubSub.broadcast(App.PubSub, "cache", {:state, state})
+    {:noreply, state}
   end
 end
